@@ -1,10 +1,21 @@
 # 变更记录
 
 版本号遵循语义化版本 `MAJOR.MINOR.PATCH`，以 Git 标签与提交信息为准，与根包常量
-`gokit.VERSION` 保持一致（当前 `v1.0.0`）。
+`gokit.VERSION` 保持一致（当前 `v1.1.0`）。
 
-> 发布标签：Go Modules 只接受三段语义化版本标签，推送时打 `v1.0.0`；依赖方按
-> `go get gitee.com/leminewx/gokit@v1.0.0` 或 `@latest` 拉取。
+> 发布标签：Go Modules 只接受三段语义化版本标签，推送时打 `v1.1.0`；依赖方按
+> `go get gitee.com/leminewx/gokit@v1.1.0` 或 `@latest` 拉取。
+
+## v1.1.0（泛型百分位入口）
+
+- `maths/percentile` 新增泛型输入包装 `TypedPercentiler[T gokit.Number]`：`NewTypedExact` /
+  `NewTypedTDigest` / `NewTypedNearestRank` 分别对应三种口径，`Add(T)` 后内部统一按 float64
+  计算，`CalculatePercentile` 返回 float64 分位值；`Merge` 只接受同算法、同数值类型的实例，
+  `GetPercentiler` 可取回底层实例与既有 API 互操作。
+- 精度边界：计算域为 float64，可精确表示的整数上限为 2^53；超出部分在 `Add` 时按最近偶数
+  舍入，需要完整保留整数精度时应选用最近秩口径。
+- 兼容性：`Percentiler` 接口与 `NewExact` / `NewTDigest` / `NewNearestRank` 保持不变，
+  升级无需修改现有调用点。
 
 ## v1.0.0（正式首发）
 

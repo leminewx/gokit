@@ -1,7 +1,7 @@
 # gokit
 
 [![Go Version](https://img.shields.io/badge/Go-1.27.0-blue.svg)](https://go.dev/)
-[![Version](https://img.shields.io/badge/version-v1.0.0-green.svg)]()
+[![Version](https://img.shields.io/badge/version-v1.1.0-green.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 
 gokit 是一个综合性 Go 工具库，涵盖**数据结构、数学计算、网络通信、配置与加密、通用组件**，
@@ -34,12 +34,12 @@ go get gitee.com/leminewx/gokit@latest
 
 | 项目 | 值 |
 |------|-----|
-| 版本 | v1.0.0（正式首发：含 maths 数值分析扩展与发布前安全加固，以 Git 标签/提交为准） |
+| 版本 | v1.1.0（新增 maths/percentile 泛型输入入口，向后兼容；v1.0.0 首发记录见 [RELEASE.md](./RELEASE.md)，以 Git 标签/提交为准） |
 | Go 最低版本 | 1.27.0 |
 | 外部依赖 | `golang.org/x/crypto`、`golang.org/x/sys` |
 
-> **版本约定**：`gokit.VERSION` 与 Git 标签完全一致，均为三段语义化版本（当前 `v1.0.0`）；
-> 依赖方按 `go get gitee.com/leminewx/gokit@v1.0.0` 或 `@latest` 拉取。
+> **版本约定**：`gokit.VERSION` 与 Git 标签完全一致，均为三段语义化版本（当前 `v1.1.0`）；
+> 依赖方按 `go get gitee.com/leminewx/gokit@v1.1.0` 或 `@latest` 拉取。
 
 ## 包概览
 
@@ -165,7 +165,8 @@ _ = password.Verify(hashed, []byte("Cictci@2022")) // 不匹配时返回 ErrPass
 
 - 统计与百分位：`Sum`、`CalculateMean`、`CalculateVariance`、`CalculateStandardDeviation`、
   `CalculateMedian`、`Count`、`CalculateRange`、`CalculateAbs`，以及 `maths/percentile` 的
-  精确 R-7、T-Digest 与最近秩（`NewNearestRank`）三种口径
+  精确 R-7、T-Digest 与最近秩（`NewNearestRank`）三种口径，并提供泛型输入包装
+  `TypedPercentiler[T]`（内部按 float64 计算）
 - 地理：LLA / ECEF / ENU 坐标、Haversine 与 Vincenty 距离、多边形周长
 - 几何与投影：GeoJSON 风格类型、线段/折线/多边形、Web Mercator、Lambert 等积与本地投影
 - 向量：1D/2D/3D、点积/叉积/模/楔积

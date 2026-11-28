@@ -20,8 +20,8 @@ import (
 //   - MINOR：向后兼容的功能新增
 //   - PATCH：向后兼容的问题修复
 //
-// 当前 v1.0.0 为正式首发版本，包含 maths 数值分析扩展与发布前安全加固。
-const VERSION = "1.0.0"
+// 当前 v1.1.0 在 v1.0.0 首发能力之上新增 maths/percentile 泛型输入入口。
+const VERSION = "1.1.0"
 
 type (
 	// Int 定义有符号整型的数据类型

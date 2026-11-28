@@ -256,6 +256,6 @@ func wrapError(sentinel error, format string, args ...any) error {
 
 ## 兼容性
 
-- 版本以 Git 标签与提交信息为准，当前为 `v1.0.0`（与根包常量 `gokit.VERSION` 一致）；遵循语义化版本：不兼容变更升 MAJOR，新增功能升 MINOR，修复升 PATCH，纯文档/测试/构建变更不单独发版。
-- `gokit.VERSION` 与 Git 标签保持一致，均为三段号；依赖方按 `@v1.0.0` 或 `@latest` 拉取，升级前请阅读 `RELEASE.md`。
+- 版本以 Git 标签与提交信息为准，当前为 `v1.1.0`（与根包常量 `gokit.VERSION` 一致）；遵循语义化版本：不兼容变更升 MAJOR，新增功能升 MINOR，修复升 PATCH，纯文档/测试/构建变更不单独发版。
+- `gokit.VERSION` 与 Git 标签保持一致，均为三段号；依赖方按 `@v1.1.0` 或 `@latest` 拉取，升级前请阅读 `RELEASE.md`。
 - 最低 Go 版本跟随 `go.mod`（当前 `1.27.0`）；使用新标准库 API 时同步更新该声明。
