@@ -1,0 +1,28 @@
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - copyloopvar
+    - durationcheck
+    - errorlint
+    - nilerr
+    - unconvert
+    - wastedassign
+  exclusions:
+    rules:
+      # 常量命名遵循团队规范（导出 UPPER_SNAKE_CASE、私有 _ + UPPER_SNAKE_CASE），
+      # staticcheck ST1003 要求 MixedCaps，此处按规范排除，不得为迎合 linter 改命名。
+      # 详见 docs/architecture.md「代码规范 / 常量」。
+      - linters:
+          - staticcheck
+        text: "ST1003"
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

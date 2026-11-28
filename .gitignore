@@ -1,0 +1,27 @@
+# Build and Release Folders
+bin-debug/
+bin-release/
+[Oo]bj/
+[Bb]in/
+
+# Other files and folders
+.settings/
+
+# Executables
+*.swf
+*.air
+*.ipa
+*.apk
+
+# Go build and test artifacts
+*.exe
+*.test
+*.out
+coverage.*
+
+# 用例在 harness/testdata 中生成的临时密钥（固定夹具 test.ini 需要提交）
+harness/testdata/*.pem
+
+# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
+# should NOT be excluded as they contain compiler settings and other important
+# information for Eclipse / Flash Builder.
