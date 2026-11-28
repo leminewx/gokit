@@ -49,8 +49,8 @@ func BenchmarkTDigestPercentile_Add(b *testing.B) {
 	rng := rand.New(rand.NewSource(42))
 
 	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		exact.Add(rng.NormFloat64())
 	}
 }
@@ -65,8 +65,8 @@ func BenchmarkTDigestPercentile_CalculatePercentile(b *testing.B) {
 	}
 
 	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		if _, err := exact.CalculatePercentile(95); err != nil {
 			b.Fatal(err)
 		}
