@@ -3,6 +3,7 @@ package percentile
 import (
 	"errors"
 	"testing"
+	"time"
 )
 
 // TestTypedPercentilerMatchesUntyped 泛型入口与 float64 入口在相同数据上必须给出完全一致的结果。
@@ -126,6 +127,64 @@ func TestTypedPercentilerIntegerPrecision(t *testing.T) {
 		}
 		if want := 2.5; got != want { // R-7：两个中间样本的线性插值
 			t.Errorf("P50 = %v, want %v", got, want)
+		}
+	})
+}
+
+// TestTypedPercentilerDuration time.Duration 作为输入类型：内部按纳秒数计算，结果可转回 Duration。
+func TestTypedPercentilerDuration(t *testing.T) {
+	t.Parallel()
+
+	t.Run("最近秩返回真实耗时样本", func(t *testing.T) {
+		t.Parallel()
+
+		calculator := NewTypedNearestRank[time.Duration]()
+		for _, value := range []time.Duration{10 * time.Millisecond, 120 * time.Millisecond, 30 * time.Millisecond} {
+			calculator.Add(value)
+		}
+
+		got, err := calculator.CalculatePercentile(100)
+		if err != nil {
+			t.Fatalf("P100 返回错误: %v", err)
+		}
+		if want := float64(120 * time.Millisecond); got != want {
+			t.Errorf("P100 = %v, want %v", got, want)
+		}
+		if converted := time.Duration(got); converted != 120*time.Millisecond {
+			t.Errorf("time.Duration(P100) = %v, want %v", converted, 120*time.Millisecond)
+		}
+	})
+
+	t.Run("R-7 插值按纳秒计算", func(t *testing.T) {
+		t.Parallel()
+
+		calculator := NewTypedExact[time.Duration]()
+		calculator.Add(time.Second)
+		calculator.Add(3 * time.Second)
+
+		got, err := calculator.CalculatePercentile(50)
+		if err != nil {
+			t.Fatalf("P50 返回错误: %v", err)
+		}
+		if want := float64(2 * time.Second); got != want {
+			t.Errorf("P50 = %v, want %v", got, want)
+		}
+	})
+
+	t.Run("超过 2^53 纳秒（约 104 天）被舍入", func(t *testing.T) {
+		t.Parallel()
+
+		const exactLimit = time.Duration(1) << 53 // 2^53 ns，约 104 天
+		calculator := NewTypedNearestRank[time.Duration]()
+		calculator.Add(exactLimit)
+		calculator.Add(exactLimit + 1)
+
+		got, err := calculator.CalculatePercentile(100)
+		if err != nil {
+			t.Fatalf("P100 返回错误: %v", err)
+		}
+		if want := float64(exactLimit); got != want {
+			t.Errorf("P100 = %v, want %v", got, want)
 		}
 	})
 }

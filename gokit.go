@@ -20,8 +20,8 @@ import (
 //   - MINOR：向后兼容的功能新增
 //   - PATCH：向后兼容的问题修复
 //
-// 当前 v1.1.0 在 v1.0.0 首发能力之上新增 maths/percentile 泛型输入入口。
-const VERSION = "1.1.0"
+// 当前 v1.2.0 在 v1.1.0 泛型入口基础上放宽输入约束（Numeric），支持 time.Duration。
+const VERSION = "1.2.0"
 
 type (
 	// Int 定义有符号整型的数据类型

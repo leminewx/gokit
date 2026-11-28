@@ -51,6 +51,12 @@ if v, err := percentile.CalculateNearestRank([]float64{5, 10, 15}, 90); err == n
 t := percentile.NewTypedNearestRank[int64]()
 t.Add(120_000)
 p99, _ := t.CalculatePercentile(99)
+
+// time.Duration 输入：按纳秒计数，结果可转回 Duration
+d := percentile.NewTypedNearestRank[time.Duration]()
+d.Add(120 * time.Millisecond)
+p95, _ := d.CalculatePercentile(95)
+_ = time.Duration(p95)
 ```
 
 | 符号 | 说明 |
@@ -60,15 +66,17 @@ p99, _ := t.CalculatePercentile(99)
 | `NewTDigest(compression float64) Percentiler` | T-Digest 近似，内存恒定，尾部精度更高 |
 | `NewNearestRank() Percentiler` | 标准最近秩法：下标 `ceil(n*p/100)-1`，结果为真实观测值，不做插值 |
 | `CalculateNearestRank(sorted []float64, p float64) (float64, error)` | 在已排序切片上直接算最近秩，不拷贝不排序 |
-| `TypedPercentiler[T gokit.Number]` | 泛型输入包装：`Add(T)`、`GetCount()`、`Merge(*TypedPercentiler[T])`、`CalculatePercentile(p float64) (float64, error)` |
+| `TypedPercentiler[T Numeric]` | 泛型输入包装：`Add(T)`、`GetCount()`、`Merge(*TypedPercentiler[T])`、`CalculatePercentile(p float64) (float64, error)` |
+| `Numeric` 约束 | `gokit.Number`（全部整数与浮点类型）与 `time.Duration` |
 | `NewTypedExact[T]()` / `NewTypedTDigest[T](compression)` / `NewTypedNearestRank[T]()` | 分别包装三种口径，输入类型为 `T`；`Merge` 仅接受同算法同类型的实例 |
 | `GetPercentiler() Percentiler` | 取回底层非泛型实例，与既有 API 互操作 |
 
 约束：至少一个数据点，`p ∈ [0,100]`，越界或空数据返回 `error`；三种实现不可互相合并。
 
 泛型入口的精度边界：内部按 float64 计算，可精确表示的整数上限为 2^53。超过该范围的
-`int64` / `uint64` 数据点在 `Add` 时即被舍入（如 2^53+1 变为 2^53），分位结果无法还原原值；
-需要完整保留整数精度时，应选择返回样本原值的最近秩口径，而不是 `TypedPercentiler`。
+`int64` / `uint64` 数据点在 `Add` 时即被舍入（如 2^53+1 变为 2^53）；`time.Duration` 以纳秒
+计数，可精确表示约 104 天，超出同样在 `Add` 时舍入。分位结果无法还原原值；需要完整保留整数
+精度时，应选择返回样本原值的最近秩口径，而不是 `TypedPercentiler`。
 
 口径差异：`NewExact`（R-7）与 `NewNearestRank`（最近秩）对同一批样本会给出不同数值
 （如 4 个样本的 P50 分别为 2.5 与 2），监控/报表选定口径后不要混用。
