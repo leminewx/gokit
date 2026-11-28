@@ -42,17 +42,19 @@ c.Put("k", 1, 0)
 source.Advance(2 * time.Minute) // 过期判定无需 sleep
 ```
 
-## `filex` 原子文件操作
+## `filex` 原子文件操作与路径定位
 
 | 函数 | 说明 |
 |------|------|
 | `WriteFileAtomic(path string, data []byte, perm os.FileMode) error` | 同目录临时文件 → `Chmod` → `Sync` → `Rename`；`perm == 0` 时按 `0600`；失败不破坏已有文件并清理临时文件 |
 | `CopyFileAtomic(src, dst string) error` | 原子复制，权限继承源文件 |
 | `CopyFileAtomicWithMode(src, dst string, perm os.FileMode) error` | 原子复制并显式指定权限 |
+| `GetModuleRoot() (string, error)` | 从工作目录向上定位 `go.mod`；工作目录不在模块内时退回到包源码位置重试，找不到返回 `ErrModuleRoot` |
+| `ResolvePath(root, relative string) (string, error)` | 把相对路径限制在 `root` 内：忽略前导 `/`，空路径返回 `ErrInvalidPath`，`..` 或指向根目录本身返回 `ErrOutsideRoot`；只做路径计算，不检查存在性与符号链接 |
 
 非 Windows 平台会尽力 fsync 目录项；临时文件统一命名为 `.<目标文件名>.tmp-*`。
 哨兵错误：`ErrInvalidPath`、`ErrCreateTemp`、`ErrOpen`、`ErrCopy`、`ErrWrite`、
-`ErrChmod`、`ErrSync`、`ErrRename`。
+`ErrChmod`、`ErrSync`、`ErrRename`、`ErrOutsideRoot`、`ErrModuleRoot`。
 
 ## `version` 版本号与区间表达式
 

@@ -20,8 +20,9 @@ import (
 //   - MINOR：向后兼容的功能新增
 //   - PATCH：向后兼容的问题修复
 //
-// 当前 v1.2.0 在 v1.1.0 泛型入口基础上放宽输入约束（Numeric），支持 time.Duration。
-const VERSION = "1.2.0"
+// 当前 v1.3.0 在 filex 新增 GetModuleRoot / ResolvePath 两个通用路径定位函数，
+// harness/assetpath 随之转为委托 filex 的兼容层。
+const VERSION = "1.3.0"
 
 type (
 	// Int 定义有符号整型的数据类型

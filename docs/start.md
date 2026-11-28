@@ -105,11 +105,11 @@ Mesh 的完整语义（Gossip、去重、KV、RPC）见 [design/mesh.md](./desig
 | `gokit` | 泛型数值约束（`Int`/`Uint`/`Float`/`Complex`/`Number`）与通用工具 |
 | `stringx` | stdlib 增强：命名转换、ANSI 剪除、数值切片拼接与解析、`strings.Builder` 池 |
 | `timex` | stdlib 增强：可注入时间源，`NewSystemClock()` 与测试用 `Manual` |
-| `filex` | stdlib 增强：`WriteFileAtomic` / `CopyFileAtomic`（同目录临时文件 + `Sync` + `Rename`） |
+| `filex` | stdlib 增强：`WriteFileAtomic` / `CopyFileAtomic`（同目录临时文件 + `Sync` + `Rename`）；`GetModuleRoot` 向上定位 go.mod，`ResolvePath` 把相对路径限制在根目录内 |
 | `version` | 版本号解析与比较（`Compare` / `Normalize`）、区间表达式匹配（`Match` / `Explain`） |
 | `logger` | 基于 `log/slog` 的 `PrettyHandler` 与 `Logger` |
 | `color` | ANSI 颜色与文本样式，支持 24 位真彩 |
-| `harness/assetpath` | 定位仓库内数据目录：`GetDataDir` / `Resolve` / `ResolveOr`，适配测试与示例 |
+| `harness/assetpath` | 兼容层（已标记 Deprecated）：`GetDataDir` / `Resolve` / `ResolveOr` 内部委托 `filex`；新代码用 `filex.GetModuleRoot` + `filex.ResolvePath` |
 
 ### 通用组件
 

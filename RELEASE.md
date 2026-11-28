@@ -1,14 +1,19 @@
 # 变更记录
 
 版本号遵循语义化版本 `MAJOR.MINOR.PATCH`，以 Git 标签与提交信息为准，与根包常量
-`gokit.VERSION` 保持一致（当前 `v1.2.0`）。
+`gokit.VERSION` 保持一致（当前 `v1.3.0`）。
 
-> 发布标签：Go Modules 只接受三段语义化版本标签，推送时打 `v1.2.0`；依赖方按
-> `go get gitee.com/leminewx/gokit@v1.2.0` 或 `@latest` 拉取。
+> 发布标签：Go Modules 只接受三段语义化版本标签，推送时打 `v1.3.0`；依赖方按
+> `go get gitee.com/leminewx/gokit@v1.3.0` 或 `@latest` 拉取。
+
+## v1.3.0（filex 路径定位、assetpath 兼容层）
+
+- `filex` 新增 `GetModuleRoot`（从工作目录或包源码位置向上定位 `go.mod`）与 `ResolvePath`（把相对路径限制在指定根目录内，越界返回 `ErrOutsideRoot`），并新增哨兵错误 `ErrOutsideRoot`、`ErrModuleRoot`。
+- `harness/assetpath` 保留为兼容层：`GetDataDir` / `Resolve` / `ResolveOr` 的签名与错误哨兵不变，内部改为委托 `filex` 实现，包已标记 Deprecated，将在下一个 MAJOR 版本移除。
 
 ## v1.2.0（泛型百分位入口支持 time.Duration）
 
-- `maths/percentile` 新增输入约束 `Numeric`（`gokit.Number` 的全部数值类型与`time.Duration`），`TypedPercentiler` 及 `NewTypedExact` / `NewTypedTDigest` /`NewTypedNearestRank` 由 `[T gokit.Number]` 放宽为 `[T Numeric]`，可直接添加`time.Duration` 数据点；`Merge` 仍只接受同算法、同数值类型的实例。
+- `maths/percentile` 新增输入约束 `Numeric`（`gokit.Number` 的全部数值类型与 `time.Duration`），`TypedPercentiler` 及 `NewTypedExact` / `NewTypedTDigest` / `NewTypedNearestRank` 由 `[T gokit.Number]` 放宽为 `[T Numeric]`，可直接添加 `time.Duration` 数据点；`Merge` 仍只接受同算法、同数值类型的实例。
 - 精度边界：`time.Duration` 以纳秒计数，float64 可精确表示约 104 天，超出部分在 `Add` 时按最近偶数舍入；需要完整保留原始精度时应选用最近秩口径。
 - 兼容性：约束放宽，既有以 `gokit.Number` 类型参数实例化的调用与 `Percentiler` 接口均不受影响。
 
@@ -18,7 +23,7 @@
 
 ## v1.1.0（泛型百分位入口）
 
-- `maths/percentile` 新增泛型输入包装 `TypedPercentiler[T gokit.Number]`：`NewTypedExact` /`NewTypedTDigest` / `NewTypedNearestRank` 分别对应三种口径，`Add(T)` 后内部统一按 float64计算，`CalculatePercentile` 返回 float64 分位值；`Merge` 只接受同算法、同数值类型的实例，`GetPercentiler` 可取回底层实例与既有 API 互操作。
+- `maths/percentile` 新增泛型输入包装 `TypedPercentiler[T gokit.Number]`：`NewTypedExact` / `NewTypedTDigest` / `NewTypedNearestRank` 分别对应三种口径，`Add(T)` 后内部统一按 float64 计算，`CalculatePercentile` 返回 float64 分位值；`Merge` 只接受同算法、同数值类型的实例，`GetPercentiler` 可取回底层实例与既有 API 互操作。
 - 精度边界：计算域为 float64，可精确表示的整数上限为 2^53；超出部分在 `Add` 时按最近偶数舍入，需要完整保留整数精度时应选用最近秩口径。
 - 兼容性：`Percentiler` 接口与 `NewExact` / `NewTDigest` / `NewNearestRank` 保持不变，升级无需修改现有调用点。
 

@@ -19,6 +19,8 @@ func TestErrorMessages(t *testing.T) {
 		ErrChmod,
 		ErrSync,
 		ErrRename,
+		ErrOutsideRoot,
+		ErrModuleRoot,
 	}
 
 	for _, err := range cases {

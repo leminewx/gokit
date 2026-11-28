@@ -1,7 +1,7 @@
 # gokit
 
 [![Go Version](https://img.shields.io/badge/Go-1.27.0-blue.svg)](https://go.dev/)
-[![Version](https://img.shields.io/badge/version-v1.2.0-green.svg)]()
+[![Version](https://img.shields.io/badge/version-v1.3.0-green.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 
 gokit 是一个综合性 Go 工具库，涵盖**数据结构、数学计算、网络通信、配置与加密、通用组件**，
@@ -34,12 +34,12 @@ go get gitee.com/leminewx/gokit@latest
 
 | 项目 | 值 |
 |------|-----|
-| 版本 | v1.2.0（泛型百分位入口支持 `time.Duration`，向后兼容；历史记录见 [RELEASE.md](./RELEASE.md)，以 Git 标签/提交为准） |
+| 版本 | v1.3.0（`filex` 新增 `GetModuleRoot` 与 `ResolvePath`，`harness/assetpath` 转为兼容层；向后兼容，历史记录见 [RELEASE.md](./RELEASE.md)） |
 | Go 最低版本 | 1.27.0 |
 | 外部依赖 | `golang.org/x/crypto`、`golang.org/x/sys` |
 
-> **版本约定**：`gokit.VERSION` 与 Git 标签完全一致，均为三段语义化版本（当前 `v1.2.0`）；
-> 依赖方按 `go get gitee.com/leminewx/gokit@v1.2.0` 或 `@latest` 拉取。
+> **版本约定**：`gokit.VERSION` 与 Git 标签完全一致，均为三段语义化版本（当前 `v1.3.0`）；
+> 依赖方按 `go get gitee.com/leminewx/gokit@v1.3.0` 或 `@latest` 拉取。
 
 ## 包概览
 
@@ -50,7 +50,7 @@ gokit/
 ├── gokit.go              # 根包：泛型数值约束 + 通用工具
 ├── stringx/              # 文本工具（stdlib 增强）：命名转换、ANSI 剪除、数值切片、Builder 池
 ├── timex/                # 时间源（stdlib 增强）：系统时钟与可手动推进的测试时钟
-├── filex/                # 文件工具（stdlib 增强）：原子写入、原子复制（掉电安全）
+├── filex/                # 文件工具（stdlib 增强）：原子写入、原子复制（掉电安全）、模块根与安全路径解析
 ├── version/              # 版本工具：版本号比较与区间表达式匹配
 ├── logger/               # 基于 log/slog 的彩色文本 Handler
 ├── color/                # ANSI 颜色与文本样式
@@ -88,7 +88,7 @@ import "gitee.com/leminewx/gokit"
 | `IsDir(filename)` | 判断是否为目录 |
 
 命名转换与字节格式化在 `stringx` 包：`stringx.ConvertToSnakeCase`、`stringx.HumanizeBytes`；
-文件落盘与版本比较在 `filex`、`version` 包。
+文件落盘、路径定位与版本比较在 `filex`、`version` 包。
 
 ## 基础工具
 
@@ -96,11 +96,11 @@ import "gitee.com/leminewx/gokit"
 |----|----------|
 | `stringx` | `ConvertToSnakeCase`、`HumanizeBytes`（IEC 单位 KiB/MiB/…）、`StripANSIString` / `StripANSIBytes`、`JoinInts` / `JoinUints`、`ParseNumbers[T]`、`GetBuilder` / `PutBuilder` |
 | `timex` | `NewSystemClock()`；测试用 `NewManual(start)` / `NewManualAt()`，通过 `Advance` / `AdvanceTo` 驱动 |
-| `filex` | `WriteFileAtomic` / `CopyFileAtomic`：同目录临时文件 + Sync + 原子改名，失败不破坏旧文件 |
+| `filex` | `WriteFileAtomic` / `CopyFileAtomic`：同目录临时文件 + Sync + 原子改名，失败不破坏旧文件；`GetModuleRoot` 向上定位 go.mod，`ResolvePath` 把相对路径限制在根目录内并拒绝 `..` 越界 |
 | `version` | `Compare` / `Normalize` 版本号比较；`Validate` / `Match` / `NormalizeExpr` / `Explain` 版本区间表达式（支持 `x` 通配与多区间并集） |
 | `color` | ANSI 颜色/样式，支持 24 位真彩与 `SetNoColor` |
 | `logger` | `NewPrettyHandler` + `NewLogger`，彩色输出、属性分组与 `ReplaceAttr` |
-| `harness/assetpath` | `GetDataDir` 定位 `harness/testdata`；`Resolve` / `ResolveOr` 把相对路径安全映射到数据目录（拒绝 `..` 越界） |
+| `harness/assetpath` | 兼容层（已标记 Deprecated）：`GetDataDir` / `Resolve` / `ResolveOr` 签名与哨兵不变，内部委托 `filex`；新代码直接用 `filex.GetModuleRoot` + `filex.ResolvePath` |
 
 ```go
 // 配置/产物落盘：进程被杀或掉电时不会留下半截文件
@@ -109,8 +109,9 @@ _ = filex.WriteFileAtomic("conf/app.ini", data, 0o644)
 // 只接受 v6.4 到 v8.0 的实现版
 ok, err := version.Match(">=v6.4.0 <v8.0.0", "app_V7.0.0.0_20260401")
 
-// 示例服务定位演示数据，越界路径回落到 data.txt
-path := assetpath.ResolveOr(r.URL.Path, "data.txt")
+// 定位模块根，再把相对路径安全映射到仓库内数据目录
+root, _ := filex.GetModuleRoot()
+path, err := filex.ResolvePath(root, "harness/testdata/data.txt")
 ```
 
 ## 通用组件

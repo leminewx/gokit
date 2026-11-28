@@ -30,11 +30,11 @@ gokit（根包：泛型数值约束 + 通用工具）
 ├── nets/          通信：TCP、编解码、Mesh、SSH（含指标采集）、SMTP、串口
 ├── scheduler/     主动调度：延迟队列、单级时间轮
 ├── structures/    纯内存结构：字典、集合、位集、布隆、Trie、FSM
-└── harness/       开发辅助：assetpath（数据目录定位，库）/ mesh_demo（示例，main）
+└── harness/       开发辅助：assetpath（兼容层，库）/ mesh_demo（示例，main）
 ```
 
-依赖方向总体自下而上：`stringx` / `timex` / `filex` / `version` / `harness/assetpath`
-不依赖任何内部包；`structures` / `maths` 不依赖 `nets`；`nets/mesh` 复用 `structures/tree`（主题匹配）；
+依赖方向总体自下而上：`stringx` / `timex` / `filex` / `version` 不依赖任何内部包；
+`harness/assetpath` 作为兼容层仅依赖 `filex`；`structures` / `maths` 不依赖 `nets`；`nets/mesh` 复用 `structures/tree`（主题匹配）；
 `scheduler`、`cache`、`speedometer` 依赖 `timex`；`logger` 依赖 `color` 与 `stringx`；
 `progressbar` 依赖 `speedometer` 与 `stringx`。
 
@@ -242,7 +242,7 @@ func wrapError(sentinel error, format string, args ...any) error {
 
 ## 目录与资产约定
 
-- **测试数据唯一目录**：`harness/testdata`。用例通过 `assetpath.Resolve` 或相对路径访问；用例自己生成的密钥等文件必须在 `t.Cleanup` 中删除。
+- **测试数据唯一目录**：`harness/testdata`。用例通过 `filex.GetModuleRoot` + `filex.ResolvePath` 或相对路径访问；用例自己生成的密钥等文件必须在 `t.Cleanup` 中删除。
 - **示例程序**：放在 `harness/` 下的独立 `main` 包，不放进 `examples/`，避免被当作库包引用。
 - **文档**：库级说明放 `docs/`，包级说明写在包注释（`go doc` 可见）。
 - **构建产物**：`*.exe` 等二进制不提交（见 `.gitignore`）。
@@ -256,6 +256,6 @@ func wrapError(sentinel error, format string, args ...any) error {
 
 ## 兼容性
 
-- 版本以 Git 标签与提交信息为准，当前为 `v1.2.0`（与根包常量 `gokit.VERSION` 一致）；遵循语义化版本：不兼容变更升 MAJOR，新增功能升 MINOR，修复升 PATCH，纯文档/测试/构建变更不单独发版。
-- `gokit.VERSION` 与 Git 标签保持一致，均为三段号；依赖方按 `@v1.2.0` 或 `@latest` 拉取，升级前请阅读 `RELEASE.md`。
+- 版本以 Git 标签与提交信息为准，当前为 `v1.3.0`（与根包常量 `gokit.VERSION` 一致）；遵循语义化版本：不兼容变更升 MAJOR，新增功能升 MINOR，修复升 PATCH，纯文档/测试/构建变更不单独发版。
+- `gokit.VERSION` 与 Git 标签保持一致，均为三段号；依赖方按 `@v1.3.0` 或 `@latest` 拉取，升级前请阅读 `RELEASE.md`。
 - 最低 Go 版本跟随 `go.mod`（当前 `1.27.0`）；使用新标准库 API 时同步更新该声明。

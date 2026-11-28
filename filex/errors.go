@@ -24,6 +24,10 @@ var (
 	ErrSync = errors.New(_ERROR_PREFIX + "failed to sync target file")
 	// ErrRename 表示原子改名失败（目标被目录占用或跨文件系统）
 	ErrRename = errors.New(_ERROR_PREFIX + "failed to rename temp file")
+	// ErrOutsideRoot 表示相对路径越出了给定根目录（含 ".." 或指向根目录本身）
+	ErrOutsideRoot = errors.New(_ERROR_PREFIX + "relative path escapes root directory")
+	// ErrModuleRoot 表示从工作目录与源码位置向上均未找到 go.mod
+	ErrModuleRoot = errors.New(_ERROR_PREFIX + "go.mod not found")
 )
 
 // wrapError 构造携带哨兵错误的包装错误，可用 errors.Is 判定
